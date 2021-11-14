@@ -8,13 +8,14 @@ import NextLink from 'next/link'
 import Image from 'next/image'
 import useStyles from '../../utils/styles'
 import { Store } from '../../utils/Store'
+import db from '../../utils/db'
+import Product from '../../models/Product'
 
-export default function ProductScreen() {
+export default function ProductScreen(props) {
+  const { product } = props
   const { state, dispath } = useContext(Store)
   const classes = useStyles()
-  const router = useRouter()
-  const { slug } = router.query
-  const product = data.products.find((a) => a.slug === slug)
+  // const product = data.products.find((a) => a.slug === slug)
 
   if (!product) {
     return <div>Product Not Found</div>
@@ -101,4 +102,23 @@ export default function ProductScreen() {
       </Grid>
     </Layout>
   )
+}
+
+export async function getServerSideProps(context: any) {
+  const { params } = context
+  const { slug } = params
+  console.log(slug)
+  await db.connect()
+  // lean()はクエリ結果を変更したり、ゲッターや変換などの機能に依存したりする場合は、を使用しないでください（公式）
+  const data = await Product.findOne({ slug }).lean()
+  console.log('data  ', data)
+  //created_at,updated_atなどのdate型は一旦文字列に変換しなおしてからでないとエラーが発生する
+  const product = JSON.parse(JSON.stringify(data))
+  // console.log(data, products)
+  await db.disconnect()
+  return {
+    props: {
+      product,
+    },
+  }
 }

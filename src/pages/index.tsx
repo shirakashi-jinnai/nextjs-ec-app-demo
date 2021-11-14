@@ -9,14 +9,16 @@ import data from '../utils/data'
 import NextLink from 'next/link'
 import Layout from '../components/Layout'
 import db from '../utils/db'
+import Product from '../models/Product'
 
-const Home = () => {
+const Home = (props) => {
+  const { products } = props
   return (
     <div>
       <Layout>
         <h1>Product</h1>
         <Grid container spacing={3}>
-          {_.map(data.products, (product, key) => (
+          {_.map(products, (product, key) => (
             <Grid item md={4} key={product.name}>
               <Card>
                 <NextLink href={`/product/${product.slug}`} passHref>
@@ -46,3 +48,20 @@ const Home = () => {
 }
 
 export default Home
+
+export async function getServerSideProps() {
+  await db.connect()
+
+  // lean()はクエリ結果を変更したり、ゲッターや変換などの機能に依存したりする場合は、を使用しないでください（公式）
+  const data = await Product.find({}).lean()
+
+  //created_at,updated_atなどのdate型は一旦文字列に変換しなおしてからでないとエラーが発生する
+  const products = JSON.parse(JSON.stringify(data))
+  // console.log(data, products)
+  await db.disconnect()
+  return {
+    props: {
+      products,
+    },
+  }
+}
