@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react'
 // eslint-disable-next-line @next/next/no-document-import-in-page
 import Document, {
   DocumentContext,
@@ -7,9 +7,9 @@ import Document, {
   Head,
   Main,
   NextScript,
-} from "next/document";
-import { ServerStyleSheets } from "@mui/styles";
-import { theme } from "../components/theme";
+} from 'next/document'
+import { ServerStyleSheets } from '@mui/styles'
+import { theme } from '../components/theme'
 
 export default class MyDocument extends Document {
   render(): JSX.Element {
@@ -28,24 +28,24 @@ export default class MyDocument extends Document {
           <NextScript />
         </body>
       </Html>
-    );
+    )
   }
 
   // `getInitialProps` belongs to `_document` (instead of `_app`),
   // it's compatible with server-side generation (SSG).
   static async getInitialProps(
-    ctx: DocumentContext
+    ctx: DocumentContext,
   ): Promise<DocumentInitialProps> {
     // Render app and page and get the context of the page with collected side effects.
-    const sheets = new ServerStyleSheets();
-    const originalRenderPage = ctx.renderPage;
+    const sheets = new ServerStyleSheets()
+    const originalRenderPage = ctx.renderPage
 
     ctx.renderPage = () =>
       originalRenderPage({
         enhanceApp: (App) => (props) => sheets.collect(<App {...props} />),
-      });
+      })
 
-    const initialProps = await Document.getInitialProps(ctx);
+    const initialProps = await Document.getInitialProps(ctx)
 
     return {
       ...initialProps,
@@ -54,6 +54,6 @@ export default class MyDocument extends Document {
         ...React.Children.toArray(initialProps.styles),
         sheets.getStyleElement(),
       ],
-    };
+    }
   }
 }

@@ -1,17 +1,18 @@
-import React from "react";
-import { AppProps } from "next/app";
-import Head from "next/head";
-import { theme } from "../components/theme";
-import { CssBaseline } from "@mui/material";
-import { ThemeProvider } from "@mui/styles";
-import Layout from "../components/Layout";
+import React from 'react'
+import { AppProps } from 'next/app'
+import Head from 'next/head'
+import { theme } from '../components/theme'
+import { CssBaseline } from '@mui/material'
+import { ThemeProvider } from '@mui/styles'
+import Layout from '../components/Layout'
+import { Store, useStore } from '../utils/Store'
 
 export default function MyApp({ Component, pageProps }: AppProps): JSX.Element {
   React.useEffect(() => {
     // Remove the server-side injected CSS.
-    const jssStyles = document.querySelector("#jss-server-side");
-    jssStyles?.parentElement?.removeChild(jssStyles);
-  }, []);
+    const jssStyles = document.querySelector('#jss-server-side')
+    jssStyles?.parentElement?.removeChild(jssStyles)
+  }, [])
 
   return (
     <>
@@ -23,11 +24,11 @@ export default function MyApp({ Component, pageProps }: AppProps): JSX.Element {
         />
       </Head>
       <ThemeProvider theme={theme}>
-        <Layout>
+        <Store.Provider value={useStore()}>
           <CssBaseline />
           <Component {...pageProps} />
-        </Layout>
+        </Store.Provider>
       </ThemeProvider>
     </>
-  );
+  )
 }

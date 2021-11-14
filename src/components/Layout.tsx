@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { FC } from 'react'
 import Head from 'next/head'
 import NextLink from 'next/link'
 import {
@@ -6,20 +6,56 @@ import {
   Container,
   IconButton,
   Link,
+  Switch,
   Toolbar,
   Typography,
 } from '@mui/material'
-import useStyles from '../utils/styles'
+import { makeStyles } from '@mui/styles'
 
-const Layout = ({ children }) => {
+type Layout = {
+  title?: string
+  description?: string
+  children: any
+}
+
+const useStyles = makeStyles({
+  navBar: {
+    backgroundColor: '#203040',
+    '& a': {
+      color: '#fff',
+      marginLeft: 10,
+    },
+  },
+  brand: {
+    fontWeight: 'bold',
+    fontSize: '1.5rem',
+  },
+  grow: {
+    flexGrow: 1,
+  },
+  main: {
+    minHeight: '80vh',
+  },
+  footer: {
+    textAlign: 'center',
+    marginTop: 10,
+  },
+})
+
+const Layout: FC<Layout> = ({ title, children, description }) => {
   const classes = useStyles()
   return (
     <div>
       <Head>
-        <title>Next.js Amazona</title>
+        <title>{title ? `${title} - Next Amazona` : 'Next Amazona'}</title>
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+        {description && <meta name="description" content={description} />}
       </Head>
-      <AppBar position="static" className={classes.navBar}>
+      <AppBar
+        position="static"
+        className={classes.navBar}
+        style={{ background: '#203040' }}
+      >
         <Toolbar>
           <NextLink href="/" passHref>
             <Link>
@@ -28,6 +64,7 @@ const Layout = ({ children }) => {
           </NextLink>
           <div className={classes.grow}></div>
           <div>
+            <Switch></Switch>
             <NextLink href="/cart" passHref>
               <Link>Cart</Link>
             </NextLink>

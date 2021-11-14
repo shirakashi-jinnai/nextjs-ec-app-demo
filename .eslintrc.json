@@ -1,3 +1,4 @@
 {
+  "env":{"brouser":true,"node":true},
   "extends": "next/core-web-vitals"
 }
