@@ -7,7 +7,7 @@ const initialState = {
 }
 
 export const useStore = () => {
-  const [state, dispath] = useReducer((state, data) => {
+  const [state, dispath] = useReducer((state: any, data: any) => {
     return _.assign({}, state, data)
   }, initialState)
 

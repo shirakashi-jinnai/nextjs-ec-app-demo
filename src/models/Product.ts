@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-// default unique => schema option
+// default uniqueなどを => schema optionという
 const productSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
