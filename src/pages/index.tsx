@@ -9,7 +9,7 @@ import data from '../utils/data'
 import NextLink from 'next/link'
 import Layout from '../components/Layout'
 import db from '../utils/db'
-import Product from '../models/Product'
+import { Product } from '../models/Product'
 
 const Home = (props) => {
   const { products } = props

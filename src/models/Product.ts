@@ -19,7 +19,14 @@ const productSchema = new mongoose.Schema(
   },
 )
 
-const Product =
-  mongoose.models.Product || mongoose.model('Product', productSchema)
+const testSchema = new mongoose.Schema({
+  lastName: String,
+  firstName: String,
+  isBoolean: Boolean,
+  ofDate: [Date],
+})
 
-export default Product
+export const Test = mongoose.models.Test || mongoose.model('Test', testSchema)
+
+export const Product =
+  mongoose.models.Product || mongoose.model('Product', productSchema)

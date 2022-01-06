@@ -9,7 +9,7 @@ import Image from 'next/image'
 import useStyles from '../../utils/styles'
 import { Store } from '../../utils/Store'
 import db from '../../utils/db'
-import Product from '../../models/Product'
+import { Product } from '../../models/Product'
 
 export default function ProductScreen(props) {
   const { product } = props
