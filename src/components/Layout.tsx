@@ -1,8 +1,10 @@
-import React, { FC } from 'react'
+import _ from 'lodash'
+import React, { FC, useContext } from 'react'
 import Head from 'next/head'
 import NextLink from 'next/link'
 import {
   AppBar,
+  Badge,
   Container,
   IconButton,
   Link,
@@ -10,7 +12,9 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material'
-import { makeStyles } from '@mui/styles'
+import { makeStyles, ThemeProvider } from '@mui/styles'
+import { Store } from '../utils/Store'
+import { theme } from './theme'
 
 type Layout = {
   title?: string
@@ -44,6 +48,9 @@ const useStyles = makeStyles({
 
 const Layout: FC<Layout> = ({ title, children, description }) => {
   const classes = useStyles()
+  const { state, dispatch } = useContext(Store)
+  const { cart } = state
+
   return (
     <div>
       <Head>
@@ -51,33 +58,46 @@ const Layout: FC<Layout> = ({ title, children, description }) => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
         {description && <meta name="description" content={description} />}
       </Head>
-      <AppBar
-        position="static"
-        className={classes.navBar}
-        style={{ background: '#203040' }}
-      >
-        <Toolbar>
-          <NextLink href="/" passHref>
-            <Link>
-              <Typography className={classes.brand}>Amazona</Typography>
-            </Link>
-          </NextLink>
-          <div className={classes.grow}></div>
-          <div>
-            <Switch></Switch>
-            <NextLink href="/cart" passHref>
-              <Link>Cart</Link>
+      <ThemeProvider theme={theme}>
+        <AppBar
+          position="static"
+          className={classes.navBar}
+          style={{ background: '#203040' }}
+        >
+          <Toolbar>
+            <NextLink href="/" passHref>
+              <Link>
+                <Typography className={classes.brand}>Amazona</Typography>
+              </Link>
             </NextLink>
-            <NextLink href="/login" passHref>
-              <Link>Login</Link>
-            </NextLink>
-          </div>
-        </Toolbar>
-      </AppBar>
-      <Container className={classes.main}>{children}</Container>
-      <footer className={classes.footer}>
-        <Typography>All rights reserved. Next Amazona</Typography>
-      </footer>
+            <div className={classes.grow}></div>
+            <div>
+              <Switch></Switch>
+              <NextLink href="/cart" passHref>
+                <Link>
+                  {_.size(cart.cartItems) > 0 ? (
+                    <Badge
+                      color="secondary"
+                      badgeContent={_.size(cart.cartItems)}
+                    >
+                      Cart
+                    </Badge>
+                  ) : (
+                    'Cart'
+                  )}
+                </Link>
+              </NextLink>
+              <NextLink href="/login" passHref>
+                <Link>Login</Link>
+              </NextLink>
+            </div>
+          </Toolbar>
+        </AppBar>
+        <Container className={classes.main}>{children}</Container>
+        <footer className={classes.footer}>
+          <Typography>All rights reserved. Next Amazona</Typography>
+        </footer>
+      </ThemeProvider>
     </div>
   )
 }

@@ -1,14 +1,16 @@
-import { Button, Grid, Link, List, ListItem, Typography } from '@mui/material'
-import Card from '@mui/material/Card'
-import { useRouter } from 'next/dist/client/router'
+import axios from 'axios'
 import React, { useContext } from 'react'
-import Layout from '../../components/Layout'
-import data from '../../utils/data'
+import { useRouter } from 'next/dist/client/router'
 import NextLink from 'next/link'
 import Image from 'next/image'
+import Cookies from 'js-cookie'
+import db from '../../utils/db'
+import { Button, Grid, Link, List, ListItem, Typography } from '@mui/material'
+import Card from '@mui/material/Card'
+import Layout from '../../components/Layout'
+import data from '../../utils/data'
 import useStyles from '../../utils/styles'
 import { Store } from '../../utils/Store'
-import db from '../../utils/db'
 import { Product } from '../../models/Product'
 
 export default function ProductScreen(props) {
@@ -19,6 +21,31 @@ export default function ProductScreen(props) {
 
   if (!product) {
     return <div>Product Not Found</div>
+  }
+  const addToCartHandler = async () => {
+    const { data } = await axios.get(`/api/products/${product._id}`)
+    console.log('data', data)
+    if (data.countInStock <= 0) {
+      window.alert('Sorry. Product is out of stock')
+      return
+    }
+    await dispath({
+      cart: {
+        // ...state.cart,
+        cartItems: {
+          ...state.cart.cartItems,
+          [product._id]: { ...data, quantity: 1 },
+        },
+      },
+    })
+    Cookies.set(
+      'cartItems',
+      JSON.stringify({
+        ...state.cart.cartItems,
+        [product._id]: { ...data, quantity: 1 },
+      }),
+    )
+    console.log('state', state.cart)
   }
   return (
     <Layout title={product.name} description={product.description}>
@@ -91,7 +118,7 @@ export default function ProductScreen(props) {
                   fullWidth
                   variant="contained"
                   color="primary"
-                  onClick={() => dispath({ darckMode: true })}
+                  onClick={addToCartHandler}
                 >
                   Add to cart
                 </Button>
