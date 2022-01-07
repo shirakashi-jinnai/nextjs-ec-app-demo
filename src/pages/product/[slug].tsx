@@ -16,6 +16,7 @@ import { Product } from '../../models/Product'
 export default function ProductScreen(props) {
   const { product } = props
   const { state, dispath } = useContext(Store)
+  const router = useRouter()
   const classes = useStyles()
   // const product = data.products.find((a) => a.slug === slug)
 
@@ -24,7 +25,7 @@ export default function ProductScreen(props) {
   }
   const addToCartHandler = async () => {
     const { data } = await axios.get(`/api/products/${product._id}`)
-    console.log('data', data)
+    // console.log('data', data)
     if (data.countInStock <= 0) {
       window.alert('Sorry. Product is out of stock')
       return
@@ -34,7 +35,7 @@ export default function ProductScreen(props) {
         // ...state.cart,
         cartItems: {
           ...state.cart.cartItems,
-          [product._id]: { ...data, quantity: 1 },
+          [product._id]: { ...product, quantity: 1 },
         },
       },
     })
@@ -42,9 +43,10 @@ export default function ProductScreen(props) {
       'cartItems',
       JSON.stringify({
         ...state.cart.cartItems,
-        [product._id]: { ...data, quantity: 1 },
+        [product._id]: { ...product, quantity: 1 },
       }),
     )
+    router.push('/cart')
     console.log('state', state.cart)
   }
   return (
