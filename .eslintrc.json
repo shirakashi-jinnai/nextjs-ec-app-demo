@@ -1,4 +1,4 @@
 {
-  "env":{"brouser":true,"node":true},
+  "env": { "brouser": true, "node": true, "es6": true },
   "extends": "next/core-web-vitals"
 }

@@ -3,6 +3,7 @@ import React from 'react'
 import { useContext } from 'react'
 import NextLink from 'next/link'
 import Image from 'next/image'
+import dynamic from 'next/dynamic'
 import {
   Button,
   Card,
@@ -23,7 +24,7 @@ import {
 import Layout from '../components/Layout'
 import { Store } from '../utils/Store'
 
-export default function CartScreen() {
+function CartScreen() {
   const { state } = useContext(Store)
   const { cartItems } = state.cart
 
@@ -97,19 +98,24 @@ export default function CartScreen() {
             <Card>
               <List>
                 <ListItem>
-                  <Typography variant="h2">
+                  <Typography variant="h4">
                     Subtotal(
-                    {_.values(cartItems).reduce((a, c) => a + c.quantity, 0)}
-                    {''}
+                    {_.values(cartItems).reduce(
+                      (acc, cal) => acc + cal.quantity,
+                      0,
+                    )}
+                    {/* {''} */}
                     items): $
                     {_.values(cartItems).reduce(
-                      (a, c) => a + c.quantity * c.price,
+                      (acc, cal) => acc + cal.quantity * cal.price,
                       0,
                     )}
                   </Typography>
                 </ListItem>
                 <ListItem>
-                  <Button></Button>
+                  <Button variant="contained" color="primary" fullWidth>
+                    Check Out
+                  </Button>
                 </ListItem>
               </List>
             </Card>
@@ -121,10 +127,12 @@ export default function CartScreen() {
 
   return (
     <Layout title="Shopping Cart">
-      <Typography component={'h1'} variant="h1">
+      <Typography component={'h1'} variant="h4">
         Shopping Cart
       </Typography>
       <CartItemsArea />
     </Layout>
   )
 }
+
+export default dynamic(() => Promise.resolve(CartScreen), { ssr: false })
