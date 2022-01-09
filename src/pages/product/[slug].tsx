@@ -15,40 +15,14 @@ import { Product } from '../../models/Product'
 
 export default function ProductScreen(props) {
   const { product } = props
-  const { state, dispath } = useContext(Store)
+  const { addToCartHandler } = useContext(Store)
   const router = useRouter()
   const classes = useStyles()
-  // const product = data.products.find((a) => a.slug === slug)
 
   if (!product) {
     return <div>Product Not Found</div>
   }
-  const addToCartHandler = async () => {
-    const { data } = await axios.get(`/api/products/${product._id}`)
-    // console.log('data', data)
-    if (data.countInStock <= 0) {
-      window.alert('Sorry. Product is out of stock')
-      return
-    }
-    await dispath({
-      cart: {
-        // ...state.cart,
-        cartItems: {
-          ...state.cart.cartItems,
-          [product._id]: { ...product, quantity: 1 },
-        },
-      },
-    })
-    Cookies.set(
-      'cartItems',
-      JSON.stringify({
-        ...state.cart.cartItems,
-        [product._id]: { ...product, quantity: 1 },
-      }),
-    )
-    router.push('/cart')
-    console.log('state', state.cart)
-  }
+
   return (
     <Layout title={product.name} description={product.description}>
       <div className={classes.section}>
@@ -120,7 +94,7 @@ export default function ProductScreen(props) {
                   fullWidth
                   variant="contained"
                   color="primary"
-                  onClick={addToCartHandler}
+                  onClick={() => addToCartHandler(product)}
                 >
                   Add to cart
                 </Button>

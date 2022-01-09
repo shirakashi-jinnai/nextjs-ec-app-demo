@@ -1,6 +1,8 @@
 import _ from 'lodash'
 import Cookies from 'js-cookie'
 import { createContext, useReducer } from 'react'
+import { useRouter } from 'next/dist/client/router'
+import axios from 'axios'
 
 export const Store = createContext(null)
 const initialState = {
@@ -13,31 +15,45 @@ const initialState = {
 }
 
 export const useStore = () => {
-  const [state, dispath] = useReducer((state: any, data: any) => {
+  const router = useRouter()
+  const [state, dispatch] = useReducer((state: any, data: any) => {
     return _.assign({}, state, data)
   }, initialState)
-  console.log('state', state)
+
+  const addToCartHandler = async (product: any) => {
+    const { data } = await axios.get(`/api/products/${product._id}`)
+    const existItem = _.find(
+      state.cart.cartItems,
+      (item) => item._id === product._id,
+    )
+    const quantity = existItem ? existItem.quantity + 1 : 1
+
+    if (data.countInStock < quantity) {
+      window.alert('Sorry. Product is out of stock')
+      return
+    }
+
+    dispatch({
+      cart: {
+        cartItems: {
+          ...state.cart.cartItems,
+          [product._id]: { ...product, quantity },
+        },
+      },
+    })
+    Cookies.set(
+      'cartItems',
+      JSON.stringify({
+        ...state.cart.cartItems,
+        [product._id]: { ...product, quantity: 1 },
+      }),
+    )
+    router.push('/cart')
+  }
 
   return {
     state,
-    dispath,
+    dispatch,
+    addToCartHandler,
   }
 }
-
-// function reducer(state, action) {
-//   switch (action.type) {
-//     case 'CART_ADD_ITEM': {
-//       const newItem = action.payload
-//       const existItem = state.cart.cartItems.find(
-//         (item) => item._id === newItem.name,
-//       )
-//       const cartItems = existItem
-//         ? state.cart.cartItems.map((item) =>
-//             item.name === existItem.name ? newItem : item,
-//           )
-//         : [...state.cart.cartItems, newItem]
-//       Cookies.set('cartItems', JSON.stringify(cartItems))
-//       return { ...state, cart: { ...state.cart, cartItems } }
-//     }
-//   }
-// }

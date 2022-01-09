@@ -4,9 +4,12 @@ import { useContext } from 'react'
 import NextLink from 'next/link'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
+import axios from 'axios'
+import Cookies from 'js-cookie'
 import {
   Button,
   Card,
+  FormControl,
   Grid,
   Link,
   List,
@@ -25,15 +28,44 @@ import Layout from '../components/Layout'
 import { Store } from '../utils/Store'
 
 function CartScreen() {
-  const { state } = useContext(Store)
+  const { state, dispatch } = useContext(Store)
   const { cartItems } = state.cart
+
+  const updateCartHandler = async (item: any, quantity: number) => {
+    const { data } = await axios.get(`/api/products/${item._id}`)
+    if (data.countInStock <= 0) {
+      window.alert('Sorry. Product is out of stock')
+      return
+    }
+    dispatch({
+      cart: {
+        ...state.cart,
+        cartItems: {
+          ...state.cart.cartItems,
+          [item._id]: { ...item, quantity },
+        },
+      },
+    })
+  }
+
+  const removeItemHandler = (item: any) => {
+    const filteredItems = _(state.cart.cartItems)
+      .filter((v) => v._id !== item._id)
+      .transform((acc, val) => (acc[val._id] = val), {})
+      .value()
+
+    dispatch({ cart: { cartItems: filteredItems } })
+    Cookies.set('cartItems', JSON.stringify(filteredItems))
+  }
 
   const CartItemsArea = () => (
     <>
       {_.isEmpty(cartItems) ? (
         <div>
-          Cart is empty
-          <NextLink href="/">Go shopping</NextLink>
+          Cart is empty.{' '}
+          <NextLink href="/">
+            <Link>Go shopping</Link>
+          </NextLink>
         </div>
       ) : (
         <Grid container spacing={1}>
@@ -72,19 +104,32 @@ function CartScreen() {
                         </NextLink>
                       </TableCell>
                       <TableCell align="right">
-                        <Select value={item.quantity}>
-                          {[...Array(Number(item.countInStock)).keys()].map(
-                            (x) => (
-                              <MenuItem key={x + 1} value={x + 1}>
-                                {x + 1}
-                              </MenuItem>
-                            ),
-                          )}
-                        </Select>
+                        <FormControl variant="standard">
+                          <Select
+                            value={item.quantity}
+                            label={item.quantity}
+                            onChange={(e) =>
+                              updateCartHandler(item, e.target.value)
+                            }
+                            style={{ color: 'black' }}
+                          >
+                            {[...Array(Number(item.countInStock)).keys()].map(
+                              (x) => (
+                                <MenuItem key={x + 1} value={x + 1}>
+                                  {x + 1}
+                                </MenuItem>
+                              ),
+                            )}
+                          </Select>
+                        </FormControl>
                       </TableCell>
                       <TableCell align="right">${item.price}</TableCell>
                       <TableCell align="right">
-                        <Button variant="contained" color="secondary">
+                        <Button
+                          variant="contained"
+                          color="secondary"
+                          onClick={() => removeItemHandler(item)}
+                        >
                           x
                         </Button>
                       </TableCell>
@@ -104,7 +149,6 @@ function CartScreen() {
                       (acc, cal) => acc + cal.quantity,
                       0,
                     )}
-                    {/* {''} */}
                     items): $
                     {_.values(cartItems).reduce(
                       (acc, cal) => acc + cal.quantity * cal.price,

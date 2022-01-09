@@ -1,18 +1,26 @@
 import _ from 'lodash'
+import { useContext } from 'react'
+import { useRouter } from 'next/dist/client/router'
+import NextLink from 'next/link'
+import axios from 'axios'
+import Cookies from 'js-cookie'
 import { Grid, CardActionArea, Typography } from '@mui/material'
 import Card from '@mui/material/Card'
 import CardMedia from '@mui/material/CardMedia'
 import CardContent from '@mui/material/CardContent'
 import CardActions from '@mui/material/CardActions'
 import Button from '@mui/material/Button'
-import data from '../utils/data'
-import NextLink from 'next/link'
 import Layout from '../components/Layout'
 import db from '../utils/db'
 import { Product } from '../models/Product'
+import { Store } from '../utils/Store'
+import data from '../utils/data'
 
 const Home = (props) => {
   const { products } = props
+  const { addToCartHandler } = useContext(Store)
+  const router = useRouter()
+
   return (
     <div>
       <Layout>
@@ -36,7 +44,12 @@ const Home = (props) => {
 
                 <CardActions>
                   <Typography>${product.price}</Typography>
-                  <Button size="small">Add to cart</Button>
+                  <Button
+                    size="small"
+                    onClick={() => addToCartHandler(product)}
+                  >
+                    Add to cart
+                  </Button>
                 </CardActions>
               </Card>
             </Grid>
