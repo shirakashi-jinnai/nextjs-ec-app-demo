@@ -4,6 +4,7 @@ import { useContext } from 'react'
 import NextLink from 'next/link'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
+import { useRouter } from 'next/dist/client/router'
 import axios from 'axios'
 import Cookies from 'js-cookie'
 import {
@@ -28,6 +29,7 @@ import Layout from '../components/Layout'
 import { Store } from '../utils/Store'
 
 function CartScreen() {
+  const router = useRouter()
   const { state, dispatch } = useContext(Store)
   const { cartItems } = state.cart
 
@@ -56,6 +58,10 @@ function CartScreen() {
 
     dispatch({ cart: { cartItems: filteredItems } })
     Cookies.set('cartItems', JSON.stringify(filteredItems))
+  }
+
+  const checkoutHandler = () => {
+    router.push('/shipping')
   }
 
   const CartItemsArea = () => (
@@ -157,7 +163,12 @@ function CartScreen() {
                   </Typography>
                 </ListItem>
                 <ListItem>
-                  <Button variant="contained" color="primary" fullWidth>
+                  <Button
+                    onChange={checkoutHandler}
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                  >
                     Check Out
                   </Button>
                 </ListItem>

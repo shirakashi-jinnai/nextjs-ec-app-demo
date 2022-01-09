@@ -48,7 +48,7 @@ const useStyles = makeStyles({
 
 const Layout: FC<Layout> = ({ title, children, description }) => {
   const classes = useStyles()
-  const { state, dispatch } = useContext(Store)
+  const { state } = useContext(Store)
   const { cart } = state
 
   return (
