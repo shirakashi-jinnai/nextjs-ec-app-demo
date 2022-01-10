@@ -163,14 +163,13 @@ function CartScreen() {
                   </Typography>
                 </ListItem>
                 <ListItem>
-                  <Button
-                    onChange={checkoutHandler}
-                    variant="contained"
-                    color="primary"
-                    fullWidth
-                  >
-                    Check Out
-                  </Button>
+                  <NextLink href={'/shipping'} passHref>
+                    <Link>
+                      <Button variant="contained" color="primary" fullWidth>
+                        Check Out
+                      </Button>
+                    </Link>
+                  </NextLink>
                 </ListItem>
               </List>
             </Card>

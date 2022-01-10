@@ -19,7 +19,6 @@ import data from '../utils/data'
 const Home = (props) => {
   const { products } = props
   const { addToCartHandler } = useContext(Store)
-  const router = useRouter()
 
   return (
     <div>
