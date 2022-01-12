@@ -20,12 +20,17 @@ type Form = {
   password: string
 }
 
-export default function Login() {
+export default function Register() {
   const router = useRouter()
   const { redirect } = router.query //login?redirect=/shipping
   const { state, dispatch } = useContext(Store)
   const { userInfo } = state
-  const [form, setForm] = useState<Form>({ email: '', password: '' })
+  const [form, setForm] = useState<any>({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  })
   const classes = useStyles()
 
   const onValueCange = ({ target }) =>
@@ -33,9 +38,17 @@ export default function Login() {
 
   const submitHandler = async (e: any) => {
     e.preventDefault()
-    const { email, password } = form
+    const { name, email, password, confirmPassword } = form
+    if (password !== confirmPassword) {
+      alert("password don't match")
+      return
+    }
     try {
-      const { data } = await axios.post('/api/users/login', { email, password })
+      const { data } = await axios.post('/api/users/register', {
+        name,
+        email,
+        password,
+      })
       dispatch({ userInfo: data })
       Cookies.set('userInfo', JSON.stringify(data))
       router.push(redirect || '/')
@@ -50,12 +63,24 @@ export default function Login() {
     }
   }, [])
   return (
-    <Layout title="Login">
+    <Layout title="Register">
       <form onSubmit={submitHandler} className={classes.form}>
         <Typography component={'h1'} variant="h4">
-          Login
+          Register
         </Typography>
         <List>
+          <ListItem>
+            <TextField
+              color="primary"
+              variant="outlined"
+              fullWidth
+              id="name"
+              label="Name"
+              value={form.name}
+              onChange={onValueCange}
+              inputProps={{ type: 'text' }}
+            />
+          </ListItem>
           <ListItem>
             <TextField
               color="primary"
@@ -81,14 +106,26 @@ export default function Login() {
             />
           </ListItem>
           <ListItem>
+            <TextField
+              color="primary"
+              variant="outlined"
+              fullWidth
+              id="confirmPassword"
+              label="Confirm Password"
+              value={form.confirmPassword}
+              onChange={onValueCange}
+              inputProps={{ type: 'password' }}
+            />
+          </ListItem>
+          <ListItem>
             <Button variant="contained" type="submit" fullWidth color="primary">
-              Login
+              Register
             </Button>
           </ListItem>
           <ListItem>
-            Don't have an account?
-            <NextLink href={`/register?redirect=${redirect || '/'}`} passHref>
-              <Link>Register</Link>
+            Already have an account? &nbsp;
+            <NextLink href={`/login?redirect=${redirect || '/'}`} passHref>
+              <Link>Login</Link>
             </NextLink>
           </ListItem>
         </List>

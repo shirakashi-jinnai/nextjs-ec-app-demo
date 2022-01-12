@@ -14,6 +14,5 @@ export default function Shipping() {
       router.push(`/login?redirect=${router.pathname}`)
     }
   }, [])
-  //   router.push('/login')
   return <div>Shipping</div>
 }
