@@ -6,6 +6,7 @@ import { CssBaseline } from '@mui/material'
 import { ThemeProvider } from '@mui/styles'
 import Layout from '../components/Layout'
 import { Store, useStore } from '../utils/Store'
+import { SnackbarProvider } from 'notistack'
 
 export default function MyApp({ Component, pageProps }: AppProps): JSX.Element {
   React.useEffect(() => {
@@ -15,20 +16,13 @@ export default function MyApp({ Component, pageProps }: AppProps): JSX.Element {
   }, [])
 
   return (
-    <>
-      <Head>
-        <title>MyApp</title>
-        <meta
-          name="viewport"
-          content="minimum-scale=1, initial-scale=1, width=device-width"
-        />
-      </Head>
+    <SnackbarProvider anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
       <ThemeProvider theme={theme}>
         <Store.Provider value={useStore()}>
           <CssBaseline />
           <Component {...pageProps} />
         </Store.Provider>
       </ThemeProvider>
-    </>
+    </SnackbarProvider>
   )
 }

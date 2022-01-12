@@ -1,6 +1,8 @@
 import React, { useState, useContext, useEffect } from 'react'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
+import { Controller, useForm } from 'react-hook-form'
+import { useSnackbar } from 'notistack'
 import {
   Button,
   Link,
@@ -22,27 +24,35 @@ type Form = {
 
 export default function Login() {
   const router = useRouter()
+  const {
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm()
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar()
   const { redirect } = router.query //login?redirect=/shipping
   const { state, dispatch } = useContext(Store)
   const { userInfo } = state
-  const [form, setForm] = useState<Form>({ email: '', password: '' })
   const classes = useStyles()
 
-  const onValueCange = ({ target }) =>
-    setForm({ ...form, [target.id]: target.value })
-
-  const submitHandler = async (e: any) => {
-    e.preventDefault()
-    const { email, password } = form
+  const submitHandler = async ({ email, password }) => {
+    closeSnackbar()
     try {
       const { data } = await axios.post('/api/users/login', { email, password })
       dispatch({ userInfo: data })
       Cookies.set('userInfo', JSON.stringify(data))
       router.push(redirect || '/')
     } catch (err) {
-      alert(err.response.data ? err.response.data.message : err.message)
+      enqueueSnackbar(
+        err.response.data ? err.response.data.message : err.message,
+        {
+          variant: 'error',
+        },
+      )
     }
   }
+
+  console.log('errors', errors)
 
   useEffect(() => {
     if (userInfo) {
@@ -51,33 +61,66 @@ export default function Login() {
   }, [])
   return (
     <Layout title="Login">
-      <form onSubmit={submitHandler} className={classes.form}>
+      <form onSubmit={handleSubmit(submitHandler)} className={classes.form}>
         <Typography component={'h1'} variant="h4">
           Login
         </Typography>
         <List>
           <ListItem>
-            <TextField
-              color="primary"
-              variant="outlined"
-              fullWidth
-              id="email"
-              label="Email"
-              value={form.email}
-              onChange={onValueCange}
-              inputProps={{ type: 'email' }}
+            <Controller
+              name="email"
+              control={control}
+              defaultValue=""
+              rules={{
+                required: true,
+                pattern: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/,
+              }}
+              render={({ field }) => (
+                <TextField
+                  color="primary"
+                  variant="outlined"
+                  fullWidth
+                  id="email"
+                  label="Email"
+                  inputProps={{ type: 'email' }}
+                  error={Boolean(errors.email)}
+                  helperText={
+                    errors.email
+                      ? errors.email.type === 'pattern'
+                        ? 'Email is not valid'
+                        : 'Email is required'
+                      : ''
+                  }
+                  {...field}
+                />
+              )}
             />
           </ListItem>
           <ListItem>
-            <TextField
-              color="primary"
-              variant="outlined"
-              fullWidth
-              id="password"
-              label="Password"
-              value={form.password}
-              onChange={onValueCange}
-              inputProps={{ type: 'password' }}
+            <Controller
+              name="password"
+              control={control}
+              defaultValue={''}
+              rules={{ required: true, minLength: 6 }}
+              render={({ field }) => (
+                <TextField
+                  color="primary"
+                  variant="outlined"
+                  fullWidth
+                  id="password"
+                  label="Password"
+                  inputProps={{ type: 'password' }}
+                  error={Boolean(errors.password)}
+                  helperText={
+                    errors.password
+                      ? errors.password.type === 'minLength'
+                        ? 'Password length is more then five'
+                        : 'Password is required'
+                      : ''
+                  }
+                  {...field}
+                />
+              )}
             />
           </ListItem>
           <ListItem>

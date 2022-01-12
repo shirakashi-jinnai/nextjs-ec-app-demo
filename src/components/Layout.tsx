@@ -15,9 +15,7 @@ import {
   Toolbar,
   Typography,
 } from '@mui/material'
-import { ThemeProvider } from '@mui/styles'
 import { Store } from '../utils/Store'
-import { theme } from './theme'
 import useStyles from '../utils/styles'
 import Cookies from 'js-cookie'
 import { useRouter } from 'next/dist/client/router'
@@ -52,72 +50,70 @@ const Layout: FC<Layout> = ({ title, children, description }) => {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
         {description && <meta name="description" content={description} />}
       </Head>
-      <ThemeProvider theme={theme}>
-        <AppBar
-          position="static"
-          className={classes.navBar}
-          style={{ background: '#203040' }}
-        >
-          <Toolbar>
-            <NextLink href="/" passHref>
+      <AppBar
+        position="static"
+        className={classes.navBar}
+        style={{ background: '#203040' }}
+      >
+        <Toolbar>
+          <NextLink href="/" passHref>
+            <Link>
+              <Typography className={classes.brand}>Amazona</Typography>
+            </Link>
+          </NextLink>
+          <div className={classes.grow}></div>
+          <div>
+            <Switch></Switch>
+            <NextLink href="/cart" passHref>
               <Link>
-                <Typography className={classes.brand}>Amazona</Typography>
+                {_.size(cart.cartItems) > 0 ? (
+                  <Badge
+                    color="secondary"
+                    badgeContent={_.size(cart.cartItems)}
+                  >
+                    Cart
+                  </Badge>
+                ) : (
+                  'Cart'
+                )}
               </Link>
             </NextLink>
-            <div className={classes.grow}></div>
-            <div>
-              <Switch></Switch>
-              <NextLink href="/cart" passHref>
-                <Link>
-                  {_.size(cart.cartItems) > 0 ? (
-                    <Badge
-                      color="secondary"
-                      badgeContent={_.size(cart.cartItems)}
-                    >
-                      Cart
-                    </Badge>
-                  ) : (
-                    'Cart'
-                  )}
-                </Link>
+            {userInfo ? (
+              <>
+                <Button
+                  aria-controls="simple-menu"
+                  aria-haspopup="true"
+                  onClick={loginClickHandler}
+                  className={classes.navbarButton}
+                >
+                  {userInfo.name}
+                </Button>
+                <Menu
+                  id="simple-menu"
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl)}
+                  keepMounted
+                  onClose={loginMenuCloseHandler}
+                >
+                  <MenuItem onClick={loginMenuCloseHandler}>Profile</MenuItem>
+                  <MenuItem onClick={loginMenuCloseHandler}>
+                    My account
+                  </MenuItem>
+                  <MenuItem onClick={logoutClickHandler}>Logout</MenuItem>
+                </Menu>
+              </>
+            ) : (
+              <NextLink href="/login" passHref>
+                <Link>Login</Link>
               </NextLink>
-              {userInfo ? (
-                <>
-                  <Button
-                    aria-controls="simple-menu"
-                    aria-haspopup="true"
-                    onClick={loginClickHandler}
-                    className={classes.navbarButton}
-                  >
-                    {userInfo.name}
-                  </Button>
-                  <Menu
-                    id="simple-menu"
-                    anchorEl={anchorEl}
-                    open={Boolean(anchorEl)}
-                    keepMounted
-                    onClose={loginMenuCloseHandler}
-                  >
-                    <MenuItem onClick={loginMenuCloseHandler}>Profile</MenuItem>
-                    <MenuItem onClick={loginMenuCloseHandler}>
-                      My account
-                    </MenuItem>
-                    <MenuItem onClick={logoutClickHandler}>Logout</MenuItem>
-                  </Menu>
-                </>
-              ) : (
-                <NextLink href="/login" passHref>
-                  <Link>Login</Link>
-                </NextLink>
-              )}
-            </div>
-          </Toolbar>
-        </AppBar>
-        <Container className={classes.main}>{children}</Container>
-        <footer className={classes.footer}>
-          <Typography>All rights reserved. Next Amazona</Typography>
-        </footer>
-      </ThemeProvider>
+            )}
+          </div>
+        </Toolbar>
+      </AppBar>
+      <Container className={classes.main}>{children}</Container>
+      <footer className={classes.footer}>
+        <Typography>All rights reserved. Next Amazona</Typography>
+      </footer>
     </div>
   )
 }

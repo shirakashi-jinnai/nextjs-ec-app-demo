@@ -1,6 +1,8 @@
 import React, { useState, useContext, useEffect } from 'react'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
+import { Controller, useForm } from 'react-hook-form'
+import { useSnackbar } from 'notistack'
 import {
   Button,
   Link,
@@ -22,25 +24,27 @@ type Form = {
 
 export default function Register() {
   const router = useRouter()
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar()
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+    control,
+  } = useForm()
+
   const { redirect } = router.query //login?redirect=/shipping
   const { state, dispatch } = useContext(Store)
   const { userInfo } = state
-  const [form, setForm] = useState<any>({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  })
   const classes = useStyles()
 
-  const onValueCange = ({ target }) =>
-    setForm({ ...form, [target.id]: target.value })
-
-  const submitHandler = async (e: any) => {
-    e.preventDefault()
-    const { name, email, password, confirmPassword } = form
+  const submitHandler = async (data: any) => {
+    closeSnackbar()
+    const { name, email, password, confirmPassword } = data
     if (password !== confirmPassword) {
-      alert("password don't match")
+      enqueueSnackbar("Password don't match", {
+        variant: 'error',
+      })
       return
     }
     try {
@@ -53,7 +57,10 @@ export default function Register() {
       Cookies.set('userInfo', JSON.stringify(data))
       router.push(redirect || '/')
     } catch (err) {
-      alert(err.response.data ? err.response.data.message : err.message)
+      enqueueSnackbar(
+        err.response.data ? err.response.data.message : err.message,
+        { variant: 'error' },
+      )
     }
   }
 
@@ -62,59 +69,123 @@ export default function Register() {
       router.push('/')
     }
   }, [])
+
   return (
     <Layout title="Register">
-      <form onSubmit={submitHandler} className={classes.form}>
+      <form onSubmit={handleSubmit(submitHandler)} className={classes.form}>
         <Typography component={'h1'} variant="h4">
           Register
         </Typography>
         <List>
           <ListItem>
-            <TextField
-              color="primary"
-              variant="outlined"
-              fullWidth
-              id="name"
-              label="Name"
-              value={form.name}
-              onChange={onValueCange}
-              inputProps={{ type: 'text' }}
+            <Controller
+              name="name"
+              defaultValue=""
+              control={control}
+              rules={{ required: true, minLength: 2 }}
+              render={({ field }) => (
+                <TextField
+                  color="primary"
+                  variant="outlined"
+                  fullWidth
+                  id="name"
+                  label="Name"
+                  inputProps={{ type: 'text' }}
+                  error={Boolean(errors.name)}
+                  helperText={
+                    errors.name
+                      ? errors.name.type === 'minLength'
+                        ? 'Name length is more than 1'
+                        : 'Name is required'
+                      : ''
+                  }
+                  {...field}
+                />
+              )}
             />
           </ListItem>
           <ListItem>
-            <TextField
-              color="primary"
-              variant="outlined"
-              fullWidth
-              id="email"
-              label="Email"
-              value={form.email}
-              onChange={onValueCange}
-              inputProps={{ type: 'email' }}
+            <Controller
+              name="email"
+              control={control}
+              defaultValue=""
+              rules={{
+                required: true,
+                pattern: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/,
+              }}
+              render={({ field }) => (
+                <TextField
+                  color="primary"
+                  variant="outlined"
+                  fullWidth
+                  id="email"
+                  label="Email"
+                  inputProps={{ type: 'email' }}
+                  error={errors.email}
+                  helperText={
+                    errors.email
+                      ? errors.email.type === 'pattern'
+                        ? 'Email is not valid'
+                        : 'Email is required'
+                      : ''
+                  }
+                  {...field}
+                />
+              )}
             />
           </ListItem>
           <ListItem>
-            <TextField
-              color="primary"
-              variant="outlined"
-              fullWidth
-              id="password"
-              label="Password"
-              value={form.password}
-              onChange={onValueCange}
-              inputProps={{ type: 'password' }}
+            <Controller
+              name="password"
+              defaultValue=""
+              control={control}
+              rules={{ required: true, minLength: 6 }}
+              render={({ field }) => (
+                <TextField
+                  color="primary"
+                  variant="outlined"
+                  fullWidth
+                  id="password"
+                  label="Password"
+                  inputProps={{ type: 'password' }}
+                  error={errors.password}
+                  helperText={
+                    errors.name
+                      ? errors.password.type === 'minLength'
+                        ? 'Password length is more than 5'
+                        : 'Password is required'
+                      : ''
+                  }
+                  {...field}
+                />
+              )}
             />
           </ListItem>
           <ListItem>
-            <TextField
-              color="primary"
-              variant="outlined"
-              fullWidth
-              id="confirmPassword"
-              label="Confirm Password"
-              value={form.confirmPassword}
-              onChange={onValueCange}
-              inputProps={{ type: 'password' }}
+            <Controller
+              name="confirmPassword"
+              defaultValue=""
+              control={control}
+              rules={{ required: true, minLength: 6 }}
+              render={({ field }) => (
+                <TextField
+                  color="primary"
+                  variant="outlined"
+                  fullWidth
+                  id="confirmPassword"
+                  label="ConfirmPassword"
+                  inputProps={{ type: 'password' }}
+                  error={errors.confirmPassword}
+                  helperText={
+                    errors.name
+                      ? errors.confirmPassword.type === 'minLength'
+                        ? 'Confirm Password length is more than 5'
+                        : 'Confirm Password  is required'
+                      : ''
+                  }
+                  {...field}
+                />
+              )}
             />
           </ListItem>
           <ListItem>
