@@ -56,7 +56,7 @@ function CartScreen() {
       .transform((acc, val) => (acc[val._id] = val), {})
       .value()
 
-    dispatch({ cart: { cartItems: filteredItems } })
+    dispatch({ cart: { ...state.cart, cartItems: filteredItems } })
     Cookies.set('cartItems', JSON.stringify(filteredItems))
   }
 
