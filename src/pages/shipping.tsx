@@ -62,11 +62,13 @@ export default function Shipping() {
     if (_.isEmpty(userInfo)) {
       router.push(`/login?redirect=${router.pathname}`)
     }
-    setValue('fullName', shippingAddress.fullName)
-    setValue('address', shippingAddress.address)
-    setValue('city', shippingAddress.city)
-    setValue('postalCode', shippingAddress.postalCode)
-    setValue('country', shippingAddress.country)
+    if (shippingAddress) {
+      setValue('fullName', shippingAddress.fullName)
+      setValue('address', shippingAddress.address)
+      setValue('city', shippingAddress.city)
+      setValue('postalCode', shippingAddress.postalCode)
+      setValue('country', shippingAddress.country)
+    }
   }, [])
 
   return (

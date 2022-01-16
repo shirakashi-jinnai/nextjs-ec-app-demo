@@ -36,7 +36,7 @@ export default function Payment() {
       enqueueSnackbar('Payment method is required', { variant: 'error' })
     } else {
       dispatch({ cart: { ...state.cart, paymentMethod } })
-      Cookies.set('paymentMethod', JSON.stringify(paymentMethod))
+      Cookies.set('paymentMethod', paymentMethod)
       router.push('/placeorder')
     }
   }
@@ -48,6 +48,8 @@ export default function Payment() {
       setPaymentMethod(Cookies.get('paymentMethod') || '')
     }
   }, [])
+
+  console.log(paymentMethod)
 
   return (
     <Layout title="Payment Method">
