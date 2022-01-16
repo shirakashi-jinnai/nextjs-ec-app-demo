@@ -37,7 +37,10 @@ const Layout: FC<Layout> = ({ title, children, description }) => {
   const loginMenuCloseHandler = () => setAnchorEl(null)
   const logoutClickHandler = () => {
     setAnchorEl(null)
-    dispatch({ userInfo: null, cart: { cartItems: {} } })
+    dispatch({
+      userInfo: null,
+      cart: { cartItems: {}, shippingAddress: {}, paymentMethod: {} },
+    })
     Cookies.remove('cartItems')
     Cookies.remove('userInfo')
     router.push('/')

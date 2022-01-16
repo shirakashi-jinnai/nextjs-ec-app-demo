@@ -44,6 +44,7 @@ export const useStore = () => {
 
     dispatch({
       cart: {
+        ...state.cart,
         cartItems: {
           ...state.cart.cartItems,
           [product._id]: { ...product, quantity },

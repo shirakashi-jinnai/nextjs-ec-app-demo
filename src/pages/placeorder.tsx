@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import React from 'react'
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import NextLink from 'next/link'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
@@ -10,6 +10,7 @@ import Cookies from 'js-cookie'
 import {
   Button,
   Card,
+  CircularProgress,
   Grid,
   Link,
   List,
@@ -27,6 +28,7 @@ import { Store } from '../utils/Store'
 import { useSnackbar } from 'notistack'
 import CheckoutWizard from '../components/CheckoutWizard'
 import useStyles from '../utils/styles'
+import { getError } from '../utils/error'
 
 function PalaceOrder() {
   const classes = useStyles()
@@ -39,16 +41,53 @@ function PalaceOrder() {
   } = state
   const { fullName, address, city, postalCode, country } = shippingAddress
   const round2 = (num: number) => Math.round(num * 100 + Number.EPSILON) / 100 // 123.456 => 123.46
-  const ItemsPrice = round2(
+  const itemsPrice = round2(
     _.values(cartItems).reduce((a, c) => a + c.price, 0),
   )
-  const shippingPrice = ItemsPrice > 200 ? 0 : 15
-  const taxPrice = round2(ItemsPrice * 0.15)
-  const totalPrice = round2(ItemsPrice + shippingPrice + taxPrice)
+  const shippingPrice = itemsPrice > 200 ? 0 : 15
+  const taxPrice = round2(itemsPrice * 0.15)
+  const totalPrice = round2(itemsPrice + shippingPrice + taxPrice)
+  const [loading, setLoading] = useState(false)
+
+  const placeOrderHandler = async () => {
+    closeSnackbar()
+    try {
+      setLoading(true)
+      const { data } = await axios.post(
+        '/api/orders',
+        {
+          orderItems: _.values(cartItems),
+          shippingAddress,
+          paymentMethod,
+          itemsPrice,
+          shippingPrice,
+          taxPrice,
+          totalPrice,
+        },
+        {
+          headers: {
+            authorization: `Bearer ${userInfo.token}`,
+          },
+        },
+      )
+      dispatch({
+        cart: { ...state.cart, cartItems: {} },
+      })
+      Cookies.remove('cartItems')
+      setLoading(false)
+      router.push(`/order/${data._id}`)
+    } catch (err) {
+      setLoading(false)
+      enqueueSnackbar(getError(err), { variant: 'error' })
+    }
+  }
 
   useEffect(() => {
     if (_.isEmpty(paymentMethod)) {
       router.push(`/payment`)
+    }
+    if (_.isEmpty(cartItems)) {
+      router.push('/cart')
     }
   }, [])
 
@@ -140,7 +179,7 @@ function PalaceOrder() {
                     <Typography>Items:</Typography>
                   </Grid>
                   <Grid item xs={6}>
-                    <Typography align="right">${ItemsPrice}</Typography>
+                    <Typography align="right">${itemsPrice}</Typography>
                   </Grid>
                 </Grid>
               </ListItem>
@@ -180,14 +219,20 @@ function PalaceOrder() {
               </ListItem>
 
               <ListItem>
-                <NextLink href={'/shipping'} passHref>
-                  <Link>
-                    <Button variant="contained" color="primary" fullWidth>
-                      Price Order
-                    </Button>
-                  </Link>
-                </NextLink>
+                <Button
+                  onClick={placeOrderHandler}
+                  variant="contained"
+                  color="primary"
+                  fullWidth
+                >
+                  Price Order
+                </Button>
               </ListItem>
+              {loading && (
+                <ListItem>
+                  <CircularProgress />
+                </ListItem>
+              )}
             </List>
           </Card>
         </Grid>

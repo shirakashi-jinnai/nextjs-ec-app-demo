@@ -39,15 +39,19 @@ function CartScreen() {
       window.alert('Sorry. Product is out of stock')
       return
     }
+    const cartItems = {
+      ...state.cart.cartItems,
+      [item._id]: { ...item, quantity },
+    }
+
     dispatch({
       cart: {
         ...state.cart,
-        cartItems: {
-          ...state.cart.cartItems,
-          [item._id]: { ...item, quantity },
-        },
+        cartItems,
       },
     })
+
+    Cookies.set('cartItems', JSON.stringify(cartItems))
   }
 
   const removeItemHandler = (item: any) => {
