@@ -37,6 +37,9 @@ const useStyles = makeStyles({
     paddingTop: 10,
     backgroundColor: 'transparent',
   },
+  error: {
+    color: '#f04040',
+  },
 })
 
 export default useStyles
