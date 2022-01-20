@@ -110,11 +110,9 @@ export default function ProductScreen(props) {
 export async function getServerSideProps(context: any) {
   const { params } = context
   const { slug } = params
-  console.log(slug)
   await db.connect()
   // lean()はクエリ結果を変更したり、ゲッターや変換などの機能に依存したりする場合は、を使用しないでください（公式）
   const data = await Product.findOne({ slug }).lean()
-  console.log('data  ', data)
   //created_at,updated_atなどのdate型は一旦文字列に変換しなおしてからでないとエラーが発生する
   const product = JSON.parse(JSON.stringify(data))
   // console.log(data, products)

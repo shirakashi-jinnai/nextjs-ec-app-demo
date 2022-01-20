@@ -7,6 +7,7 @@ import { ThemeProvider } from '@mui/styles'
 import Layout from '../components/Layout'
 import { Store, useStore } from '../utils/Store'
 import { SnackbarProvider } from 'notistack'
+import { PayPalScriptProvider } from '@paypal/react-paypal-js'
 
 export default function MyApp({ Component, pageProps }: AppProps): JSX.Element {
   React.useEffect(() => {
@@ -19,8 +20,10 @@ export default function MyApp({ Component, pageProps }: AppProps): JSX.Element {
     <SnackbarProvider anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
       <ThemeProvider theme={theme}>
         <Store.Provider value={useStore()}>
-          <CssBaseline />
-          <Component {...pageProps} />
+          <PayPalScriptProvider deferLoading={true}>
+            <CssBaseline />
+            <Component {...pageProps} />
+          </PayPalScriptProvider>
         </Store.Provider>
       </ThemeProvider>
     </SnackbarProvider>

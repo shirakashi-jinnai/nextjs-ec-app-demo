@@ -6,6 +6,7 @@ import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/dist/client/router'
 import axios from 'axios'
+import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js'
 import Cookies from 'js-cookie'
 import {
   Button,
@@ -25,10 +26,10 @@ import {
 } from '@mui/material'
 import Layout from '../../components/Layout'
 import { Store } from '../../utils/Store'
-import { useSnackbar } from 'notistack'
 import CheckoutWizard from '../../components/CheckoutWizard'
 import useStyles from '../../utils/styles'
-import { getError } from '../../utils/error'
+import { getError, onError } from '../../utils/error'
+import { useSnackbar } from 'notistack'
 
 function Order({ params }) {
   const router = useRouter()
@@ -36,9 +37,10 @@ function Order({ params }) {
   const classes = useStyles()
   const { state } = useContext(Store)
   const { userInfo } = state
-  console.log(router.query.id)
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar()
+  const [{ isPending }, paypalDispatch] = usePayPalScriptReducer()
 
-  const [{ loading, error, order }, setOrderState] = useReducer(
+  const [{ loading, error, order, successPay }, setOrderState] = useReducer(
     (state, dispatch) => _.assign({}, state, dispatch),
     {
       loading: true,
@@ -61,12 +63,48 @@ function Order({ params }) {
     deliveredAt,
   } = order
 
+  function createOrder(data, actions) {
+    console.log('clicked createOrder')
+    return actions.order
+      .create({
+        purchase_units: [{ amount: { value: totalPrice } }],
+      })
+      .then((orderID) => {
+        return orderID
+      })
+  }
+
+  function onApprove(data, actions) {
+    console.log('clicked onApprove')
+    return actions.order.capture().then(async function (details) {
+      console.log('details', details)
+      try {
+        setOrderState({ loadingPay: true }) //Pay request
+        const { data } = await axios.put(
+          `/api/orders/${order._id}/pay`,
+          details,
+          {
+            headers: { authorization: `Bearer ${userInfo.token}` },
+          },
+        )
+        setOrderState({ loadingPay: false, successPay: true }) //Pay success
+        enqueueSnackbar('Order is paid', { variant: 'success' })
+      } catch (err) {
+        setOrderState({ error: getError(err) }) //Pay fail
+        enqueueSnackbar(getError(err), { variant: 'error' })
+      }
+    })
+  }
+
+  function onError(err) {
+    enqueueSnackbar(getError(err), { variant: 'error' })
+  }
+
   useEffect(() => {
     if (_.isEmpty(userInfo)) {
-      router.push(`/login?redirect=${router.pathname}`)
+      router.push(`/login`)
     }
     const fetchOrder = async () => {
-      console.log('fetchorder')
       try {
         setOrderState({ loading: true })
         const { data } = await axios.get(`/api/orders/${orderId}`, {
@@ -75,15 +113,36 @@ function Order({ params }) {
         setOrderState({ order: data, loading: false })
       } catch (err) {
         setOrderState({ loading: false, error: getError(err) })
-        // enqueueSnackbar(getError(err), { variant: 'error' })
       }
     }
-    if (_.isEmpty(order._id) || (order._id && order._id !== orderId)) {
+    if (
+      _.isEmpty(order._id) ||
+      successPay ||
+      (order._id && order._id !== orderId)
+    ) {
       fetchOrder()
+      if (successPay) {
+        setOrderState({ loadingPay: false, successPay: false, errorPay: '' })
+      }
+    } else {
+      const loadPaypalScript = async () => {
+        const { data: clientId } = await axios.get('/api/keys/paypal', {
+          headers: { authorization: `Bearer ${userInfo.token}` },
+        })
+        paypalDispatch({
+          type: 'resetOptions',
+          value: { 'client-id': clientId, currency: 'USD' },
+        })
+        paypalDispatch({
+          type: 'setLoadingStatus',
+          value: 'pending',
+        })
+      }
+      loadPaypalScript()
     }
-  }, [order])
+  }, [order, successPay])
 
-  console.log(order)
+  console.log('loadscript')
 
   const OrderDetailsArea = () => (
     <>
@@ -223,6 +282,21 @@ function Order({ params }) {
                   </Grid>
                 </Grid>
               </ListItem>
+              {!isPaid && (
+                <ListItem>
+                  {isPending ? (
+                    <CircularProgress />
+                  ) : (
+                    <div className={classes.fullWidth}>
+                      <PayPalButtons
+                        createOrder={createOrder}
+                        onApprove={onApprove}
+                        onError={onError}
+                      />
+                    </div>
+                  )}
+                </ListItem>
+              )}
             </List>
           </Card>
         </Grid>
