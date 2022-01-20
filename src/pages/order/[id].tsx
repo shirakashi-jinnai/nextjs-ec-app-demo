@@ -77,7 +77,6 @@ function Order({ params }) {
   function onApprove(data, actions) {
     console.log('clicked onApprove')
     return actions.order.capture().then(async function (details) {
-      console.log('details', details)
       try {
         setOrderState({ loadingPay: true }) //Pay request
         const { data } = await axios.put(
@@ -87,10 +86,14 @@ function Order({ params }) {
             headers: { authorization: `Bearer ${userInfo.token}` },
           },
         )
-        setOrderState({ loadingPay: false, successPay: true }) //Pay success
+        setOrderState({
+          loadingPay: false,
+          successPay: true,
+          order: data.order,
+        }) //Pay success
         enqueueSnackbar('Order is paid', { variant: 'success' })
       } catch (err) {
-        setOrderState({ error: getError(err) }) //Pay fail
+        setOrderState({ loadingPay: false, errorPay: getError(err) }) //Pay fail
         enqueueSnackbar(getError(err), { variant: 'error' })
       }
     })
@@ -104,6 +107,7 @@ function Order({ params }) {
     if (_.isEmpty(userInfo)) {
       router.push(`/login`)
     }
+
     const fetchOrder = async () => {
       try {
         setOrderState({ loading: true })
@@ -115,6 +119,7 @@ function Order({ params }) {
         setOrderState({ loading: false, error: getError(err) })
       }
     }
+
     if (
       _.isEmpty(order._id) ||
       successPay ||
@@ -141,8 +146,6 @@ function Order({ params }) {
       loadPaypalScript()
     }
   }, [order, successPay])
-
-  console.log('loadscript')
 
   const OrderDetailsArea = () => (
     <>
