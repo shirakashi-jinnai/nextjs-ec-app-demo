@@ -52,8 +52,6 @@ export default function Login() {
     }
   }
 
-  console.log('errors', errors)
-
   useEffect(() => {
     if (userInfo) {
       router.push('/')

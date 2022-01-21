@@ -41,8 +41,6 @@ export default function Shipping() {
   } = state
   const classes = useStyles()
 
-  console.log(state)
-
   const submitHandler = async (data: any) => {
     const { fullName, address, city, postalCode, country } = data
     dispatch({

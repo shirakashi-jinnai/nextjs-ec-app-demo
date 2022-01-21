@@ -69,7 +69,6 @@ export async function getServerSideProps() {
 
   //created_at,updated_atなどのdate型は一旦文字列に変換しなおしてからでないとエラーが発生する
   const products = JSON.parse(JSON.stringify(data))
-  // console.log(data, products)
   await db.disconnect()
   return {
     props: {

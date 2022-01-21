@@ -8,9 +8,7 @@ handler.use(isAuth);
 
 handler.get(async (req, res) => {
   await db.connect();
-  console.log("query_id", req.query.id);
   const order = await Order.findById(req.query.id);
-  console.log("order", order);
   await db.disconnect();
   res.send(order);
 });

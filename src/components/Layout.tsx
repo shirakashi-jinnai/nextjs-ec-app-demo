@@ -34,7 +34,6 @@ const Layout: FC<Layout> = ({ title, children, description }) => {
 
   const [anchorEl, setAnchorEl] = useState(null)
   const loginClickHandler = (e) => setAnchorEl(e.currentTarget)
-  const loginMenuCloseHandler = () => setAnchorEl(null)
   const logoutClickHandler = () => {
     setAnchorEl(null)
     dispatch({
@@ -44,6 +43,12 @@ const Layout: FC<Layout> = ({ title, children, description }) => {
     Cookies.remove('cartItems')
     Cookies.remove('userInfo')
     router.push('/')
+  }
+  const loginMenuCloseHandler = (e, redirect?) => {
+    setAnchorEl(null)
+    if (redirect) {
+      router.push(redirect)
+    }
   }
 
   return (
@@ -98,9 +103,15 @@ const Layout: FC<Layout> = ({ title, children, description }) => {
                   keepMounted
                   onClose={loginMenuCloseHandler}
                 >
-                  <MenuItem onClick={loginMenuCloseHandler}>Profile</MenuItem>
-                  <MenuItem onClick={loginMenuCloseHandler}>
-                    My account
+                  <MenuItem
+                    onClick={(e) => loginMenuCloseHandler(e, '/profile')}
+                  >
+                    Profile
+                  </MenuItem>
+                  <MenuItem
+                    onClick={(e) => loginMenuCloseHandler(e, '/order-history')}
+                  >
+                    Order History
                   </MenuItem>
                   <MenuItem onClick={logoutClickHandler}>Logout</MenuItem>
                 </Menu>

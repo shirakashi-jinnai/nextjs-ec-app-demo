@@ -49,8 +49,6 @@ export default function Payment() {
     }
   }, [])
 
-  console.log(paymentMethod)
-
   return (
     <Layout title="Payment Method">
       <CheckoutWizard activeStep={2} />

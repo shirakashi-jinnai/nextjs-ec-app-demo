@@ -115,7 +115,6 @@ export async function getServerSideProps(context: any) {
   const data = await Product.findOne({ slug }).lean()
   //created_at,updated_atなどのdate型は一旦文字列に変換しなおしてからでないとエラーが発生する
   const product = JSON.parse(JSON.stringify(data))
-  // console.log(data, products)
   await db.disconnect()
   return {
     props: {

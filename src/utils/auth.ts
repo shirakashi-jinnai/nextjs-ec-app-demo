@@ -21,7 +21,7 @@ const isAuth = async (req, res, next) => {
       if (err) {
         res.status(401).send({ message: 'Token is not valid' })
       } else {
-        req.user = decode
+        req.user = decode //ユーザーの持っている情報
         next()
       }
     })
