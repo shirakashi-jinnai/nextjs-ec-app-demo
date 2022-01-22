@@ -109,6 +109,7 @@ function Order({ params }) {
     }
 
     const fetchOrder = async () => {
+      console.log('fetch')
       try {
         setOrderState({ loading: true })
         const { data } = await axios.get(`/api/orders/${orderId}`, {
@@ -131,6 +132,7 @@ function Order({ params }) {
       }
     } else {
       const loadPaypalScript = async () => {
+        console.log('loadscript')
         const { data: clientId } = await axios.get('/api/keys/paypal', {
           headers: { authorization: `Bearer ${userInfo.token}` },
         })

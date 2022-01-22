@@ -16,6 +16,7 @@ import Layout from '../components/Layout'
 import useStyles from '../utils/styles'
 import { Store } from '../utils/Store'
 import Cookies from 'js-cookie'
+import { getError } from '../utils/error'
 
 type Form = {
   email: string
@@ -57,10 +58,7 @@ export default function Register() {
       Cookies.set('userInfo', JSON.stringify(data))
       router.push(redirect || '/')
     } catch (err) {
-      enqueueSnackbar(
-        err.response.data ? err.response.data.message : err.message,
-        { variant: 'error' },
-      )
+      enqueueSnackbar(getError(err), { variant: 'error' })
     }
   }
 
@@ -150,7 +148,7 @@ export default function Register() {
                   inputProps={{ type: 'password' }}
                   error={errors.password}
                   helperText={
-                    errors.name
+                    errors.password
                       ? errors.password.type === 'minLength'
                         ? 'Password length is more than 5'
                         : 'Password is required'
@@ -177,7 +175,7 @@ export default function Register() {
                   inputProps={{ type: 'password' }}
                   error={errors.confirmPassword}
                   helperText={
-                    errors.name
+                    errors.confirmPassword
                       ? errors.confirmPassword.type === 'minLength'
                         ? 'Confirm Password length is more than 5'
                         : 'Confirm Password  is required'

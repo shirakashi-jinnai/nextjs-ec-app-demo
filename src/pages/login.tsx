@@ -16,11 +16,7 @@ import Layout from '../components/Layout'
 import useStyles from '../utils/styles'
 import { Store } from '../utils/Store'
 import Cookies from 'js-cookie'
-
-type Form = {
-  email: string
-  password: string
-}
+import { getError } from '../utils/error'
 
 export default function Login() {
   const router = useRouter()
@@ -43,12 +39,9 @@ export default function Login() {
       Cookies.set('userInfo', JSON.stringify(data))
       router.push(redirect || '/')
     } catch (err) {
-      enqueueSnackbar(
-        err.response.data ? err.response.data.message : err.message,
-        {
-          variant: 'error',
-        },
-      )
+      enqueueSnackbar(getError(err), {
+        variant: 'error',
+      })
     }
   }
 
