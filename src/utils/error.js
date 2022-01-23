@@ -10,4 +10,12 @@ const onError = async (err, req, res, next) => {
   res.status(500).send({ message: err.toString() });
 };
 
-export { getError, onError };
+const isAdmin = async (req, res, next) => {
+  if (req.user.isAdmin) {
+    next();
+  } else {
+    res.status(401).send({ message: "User is not admin" });
+  }
+};
+
+export { getError, onError, isAdmin };
