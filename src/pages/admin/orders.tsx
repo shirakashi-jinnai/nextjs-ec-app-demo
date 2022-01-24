@@ -96,63 +96,69 @@ export default function AdminOrders() {
         </Grid>
         <Grid item md={9} xs={12}>
           <Card className={classes.section}>
-            <Typography component={'h1'} variant="h4">
-              Orders
-            </Typography>
+            <List>
+              <ListItem>
+                <Typography component={'h1'} variant="h4">
+                  Orders
+                </Typography>
+              </ListItem>
 
-            <ListItem>
-              {loading ? (
-                <CircularProgress />
-              ) : error ? (
-                <Typography className={classes.error}>{error}</Typography>
-              ) : (
-                <TableContainer>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>ID</TableCell>
-                        <TableCell>USER</TableCell>
-                        <TableCell>DATE</TableCell>
-                        <TableCell>TOTAL</TableCell>
-                        <TableCell>PAID</TableCell>
-                        <TableCell>DELIVERED</TableCell>
-                        <TableCell>ACTION</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {_(orders)
-                        .values()
-                        .map((order) => (
-                          <TableRow key={order._id}>
-                            <TableCell>{order._id.substring(20, 24)}</TableCell>
-                            <TableCell>
-                              {order.user.name || 'DELETED USER'}
-                            </TableCell>
-                            <TableCell>{order.createdAt}</TableCell>
-                            <TableCell>{order.totalPrice}</TableCell>
-                            <TableCell>
-                              {order.isPaid
-                                ? `paid at ${order.paidAt}`
-                                : 'not paid'}
-                            </TableCell>
-                            <TableCell>
-                              {order.isDelivered
-                                ? `delivered at ${order.deliveredAt}`
-                                : 'not delivered'}
-                            </TableCell>
-                            <TableCell>
-                              <NextLink href={`/order/${order._id}`} passHref>
-                                <Button variant="contained">Details</Button>
-                              </NextLink>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                        .value()}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              )}
-            </ListItem>
+              <ListItem>
+                {loading ? (
+                  <CircularProgress />
+                ) : error ? (
+                  <Typography className={classes.error}>{error}</Typography>
+                ) : (
+                  <TableContainer>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>ID</TableCell>
+                          <TableCell>USER</TableCell>
+                          <TableCell>DATE</TableCell>
+                          <TableCell>TOTAL</TableCell>
+                          <TableCell>PAID</TableCell>
+                          <TableCell>DELIVERED</TableCell>
+                          <TableCell>ACTION</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {_(orders)
+                          .values()
+                          .map((order) => (
+                            <TableRow key={order._id}>
+                              <TableCell>
+                                {order._id.substring(20, 24)}
+                              </TableCell>
+                              <TableCell>
+                                {order.user.name || 'DELETED USER'}
+                              </TableCell>
+                              <TableCell>{order.createdAt}</TableCell>
+                              <TableCell>{order.totalPrice}</TableCell>
+                              <TableCell>
+                                {order.isPaid
+                                  ? `paid at ${order.paidAt}`
+                                  : 'not paid'}
+                              </TableCell>
+                              <TableCell>
+                                {order.isDelivered
+                                  ? `delivered at ${order.deliveredAt}`
+                                  : 'not delivered'}
+                              </TableCell>
+                              <TableCell>
+                                <NextLink href={`/order/${order._id}`} passHref>
+                                  <Button variant="contained">Details</Button>
+                                </NextLink>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                          .value()}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                )}
+              </ListItem>
+            </List>
           </Card>
         </Grid>
       </Grid>
