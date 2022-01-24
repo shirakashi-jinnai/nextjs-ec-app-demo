@@ -64,7 +64,22 @@ export default function AdminProducts() {
     }
   }
 
-  const deleteHandler = () => {}
+  const deleteHandler = async (productId) => {
+    if (!window.confirm('商品を削除しますか？')) {
+      return
+    }
+    try {
+      setProductsState({ loadingDelete: true })
+      await axios.delete(`/api/admin/products/${productId}`, {
+        headers: { authorization: `Bearer ${userInfo.token}` },
+      })
+      setProductsState({ loadingDelete: false, successDelete: true })
+      enqueueSnackbar('削除が完了しました', { variant: 'success' })
+    } catch (err) {
+      setProductsState({ loadingDelete: false, error: getError(err) })
+      enqueueSnackbar(getError(err), { variant: 'error' })
+    }
+  }
 
   useEffect(() => {
     if (_.isEmpty(userInfo)) {
@@ -105,12 +120,12 @@ export default function AdminProducts() {
                 </ListItem>
               </NextLink>
               <NextLink href="/admin/orders" passHref>
-                <ListItem selected button component="a">
+                <ListItem button component="a">
                   <ListItemText primary="Orders"></ListItemText>
                 </ListItem>
               </NextLink>
               <NextLink href="/admin/products" passHref>
-                <ListItem button component="a">
+                <ListItem selected button component="a">
                   <ListItemText primary="Products"></ListItemText>
                 </ListItem>
               </NextLink>
@@ -182,7 +197,7 @@ export default function AdminProducts() {
                                   </Button>
                                 </NextLink>
                                 <Button
-                                  onClick={deleteHandler}
+                                  onClick={() => deleteHandler(product._id)}
                                   size="small"
                                   variant="contained"
                                   color="error"
