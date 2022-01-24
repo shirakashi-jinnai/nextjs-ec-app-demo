@@ -10,9 +10,10 @@ const handler = nc();
 
 handler.get(async (req, res) => {
   await db.connect();
-  const orders = await Order.countDocuments();
-  const products = await Product.countDocuments();
-  const users = await User.find().select("_id").populate("_id");
+  const ordersCount = await Order.countDocuments();
+  const productsCount = await Product.countDocuments();
+  const usersCount = await User.find().select("_id").populate("_id");
+  const orders = await Order.find().populate("user", "name"); //({ path: "user", select: "email" })と同義;
 
   //aggregateはfindのパイプラインとは別のパイプラインで検索、集計することが可能（lean同様、純粋なjavascriptとしてリターンされる）
   const orderPriceGroup = await Order.aggregate([
@@ -41,13 +42,7 @@ handler.get(async (req, res) => {
 
   await db.disconnect();
 
-  res.send({
-    orders,
-    products,
-    users,
-    orderPriceGroup,
-    salesData,
-  });
+  res.send({ orders });
 });
 
 export default handler;

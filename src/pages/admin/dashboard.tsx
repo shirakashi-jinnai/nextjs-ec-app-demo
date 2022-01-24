@@ -194,6 +194,25 @@ export default function AdminDashboard() {
                   }}
                 />
               </ListItem>
+              <ListItem>
+                <Line
+                  data={{
+                    labels: summary.salesData.map((val) => val._id),
+                    datasets: [
+                      {
+                        label: 'Sales',
+                        backgroundColor: 'rgba(162, 222, 208, 1)',
+                        data: summary.salesData.map((val) => val.totalSales),
+                      },
+                    ],
+                  }}
+                  options={{
+                    plugins: {
+                      legend: { display: true, position: 'right' },
+                    },
+                  }}
+                />
+              </ListItem>
             </List>
           </Card>
         </Grid>

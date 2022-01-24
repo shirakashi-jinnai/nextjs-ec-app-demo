@@ -42,7 +42,7 @@ function PalaceOrder() {
   const { fullName, address, city, postalCode, country } = shippingAddress
   const round2 = (num: number) => Math.round(num * 100 + Number.EPSILON) / 100 // 123.456 => 123.46
   const itemsPrice = round2(
-    _.values(cartItems).reduce((a, c) => a + c.price, 0),
+    _.values(cartItems).reduce((a, c) => a + Number(c.price), 0),
   )
   const shippingPrice = itemsPrice > 200 ? 0 : 15
   const taxPrice = round2(itemsPrice * 0.15)
